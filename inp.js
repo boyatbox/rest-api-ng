@@ -1,7 +1,7 @@
  //Initiallising node modules
  var express = require("express");
  var bodyParser = require("body-parser");
- var sql = require("mssql");
+ var sql = require("mssql/msnodesqlv8");
  var app = express();
 
  // Body Parser Middleware
@@ -24,10 +24,7 @@
 
  //Initiallising connection string
  var dbConfig = {
-     user: "mm",
-     password: "m",
-     server: "localhost",
-     database: "restdb"
+    connectionString: 'Driver=SQL Server;Server=DESKTOP-OVIBE68;Database=restdb;Trusted_Connection=true;'
  };
 
  //Function to connect to database and execute query
