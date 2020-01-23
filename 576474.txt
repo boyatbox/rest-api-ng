@@ -11,3 +11,22 @@ GET /api/v1/authors?filters=[COMMA SEPARATED LIST OF FILTERS]
 /getBooksImages=> GET /books/:id/images
 /addCoverImage=> POST /books/:id/cover_image
 /listBooksCovers=> GET /books (This information can be returned in this endpoint using subresources.)
+
+GET /users
+GET /users?role=admin
+
+config/env1.json::
+{
+	{
+	"secretKey": "key",
+	"env": "default",
+	"server": {
+	"name": "xyz API",
+	"version": "1.0.0",
+	"port": 8080
+	},
+	"database": {
+	"host": "localhost",
+	"dbname": "testdb"
+	}
+}
