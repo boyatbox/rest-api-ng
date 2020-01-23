@@ -56,7 +56,7 @@
 
  //GET API
  app.get("/api/per", function(req, res) {
-     var query = "select * from Persons";
+     var query = "select * from restdb.dbo.stocks";
      executeQuery(res, query);
  });
 
