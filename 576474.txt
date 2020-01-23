@@ -1,0 +1,13 @@
+PUT /api/v1/blogposts/12342?action=like
+GET /api/v1/books?q=[SEARCH-TERM]
+GET /api/v1/authors?filters=[COMMA SEPARATED LIST OF FILTERS]
+
+/getAllBooks=>GET /books
+/submitNewBook=> POST /books
+/updateAuthor=> PUT /authors/:id
+/getBooksAuthors=> GET /books/:id/authors
+/getNumberOfBooksOnStock=> GET /books (This number can easily be returned as part of this endpoint.)
+/addNewImageToBook=> PUT /books/:id
+/getBooksImages=> GET /books/:id/images
+/addCoverImage=> POST /books/:id/cover_image
+/listBooksCovers=> GET /books (This information can be returned in this endpoint using subresources.)
