@@ -51,6 +51,13 @@
 
  //POST API
  app.post("/api/user", function(req, res) {
+ 	var query = "SELECT ci.CI_Application_ID,ci.CI_Application_Name,vsam.ValueStream_ID,vs.ValueStream_Name,pf.Portfolio_ID,pf.Portfolio_Name \
+				FROM CI_Application ci, VS_CI_Application_Map vsam, ValueStream vs, Portfolio pf,Portfolio_VS_Map pvm \
+				WHERE vsam.CI_Application_ID = ci.CI_Application_ID \
+				AND vs.ValueStream_ID=vsam.ValueStream_ID \
+				AND vs.ValueStream_ID=pvm.ValueStream_ID \
+				AND pvm.Portfolio_ID=pf.Portfolio_ID";
+     executeQuery(res, query);
 
  });
 
