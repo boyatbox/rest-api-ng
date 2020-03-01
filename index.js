@@ -53,21 +53,121 @@
      });
  }
 
+//Function to connect to database and execute query
+ var executeQueryBuilds = function(res, query) {
+     sql.connect(dbConfig, function(err) {
+         if (err) {
+             console.log("Error while connecting database :- " + err);
+             res.send(err);
+         } else {
+             console.log("db connection: success");
+             var request = new sql.Request();
+             request.query(query, function(err, dbresponse) {
+                 if (err) {
+                     console.log("Error while querying database :- " + err);
+                     res.send(err);
+                 } else {
+                    console.log("Exec query: success");
+                    jsonArry=dbresponse.recordsets[0];
+                    var buildData = {};
+                    buildData.total_count=jsonArry[0]['total_count'];
+                    for(var i = 0; i < jsonArry.length; i++) {
+                        delete jsonArry[i]['total_count'];
+                    }
+                    buildData.builds=jsonArry;
+                    res.send(JSON.stringify(buildData));
+                 }
+             });
+         }
+     });
+ }
+
  //GET API
  app.get("/api/per", function(req, res) {
      var query = "select * from restdb.dbo.stocks";
      executeQuery(res, query);
  });
 
+ app.get("/api/builds", function(req, res) {
+     var query = "select * from testdb.dbo.BuildList";
+     executeQuery(res, query);
+ });
+
+//pg,sz
  //POST API
- app.get("/api/app", function(req, res) {
+ //localhost:8080/api/page/?sort=columnname&order=asc&pg=2&sz=3
+ //http://localhost:8080/api/page/?sort=Build_ID&order=asc&pg=2&sz=3
+ app.get("/api/page", function(req, res) {
+    var page=req.query.pg;
+    var itemsPerPage=req.query.sz;
+    var orderByCol=req.query.sort;
+    var sortOrder=req.query.order;
+    if(sortOrder.toUpperCase() === "DESC"){
+        sortOrder="DESC";
+    }else{
+        sortOrder="ASC";
+    }
+    console.log(itemsPerPage);
+    var offset = (page - 1) * itemsPerPage;
+    console.log("page:"+page+", size:"+itemsPerPage+", offset:"+offset);
+    var query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"
+    executeQueryBuilds(res, query);
+ });
+
+app.get("/api/json", function(req, res) {
+    
     var query = "SELECT pf.Portfolio_ID,vsam.ValueStream_ID,ci.CI_Application_ID,pf.Portfolio_Name,vs.ValueStream_Name,ci.CI_Application_Name\
                 FROM CI_Application ci, VS_CI_Application_Map vsam, ValueStream vs, Portfolio pf,Portfolio_VS_Map pvm\
                 WHERE vsam.CI_Application_ID = ci.CI_Application_ID\
                 AND vs.ValueStream_ID=vsam.ValueStream_ID\
                 AND vs.ValueStream_ID=pvm.ValueStream_ID\
                 AND pvm.Portfolio_ID=pf.Portfolio_ID";
-     executeQuery(res, query);
+
+ 
+
+
+    sql.connect(dbConfig, function(err) {
+    if (err) {
+         console.log("Error while connecting database :- " + err);
+         res.send(err);
+    } else {
+         console.log("db connection: success");
+         var request = new sql.Request();
+         request.query(query, function(err, dbresponse) {
+             if (err) {
+                 console.log("Error while querying database :- " + err);
+                 res.send(err);
+             } else {
+                console.log("Exec query: success");
+                var treeData = {};
+                dbresponse=dbresponse.recordsets[0];
+                for (var i in dbresponse) {
+                    var pf = dbresponse[i].Portfolio_Name;
+                    var vsData = {};
+                    for (var j in dbresponse) {
+                        if((pf===dbresponse[j].Portfolio_Name)){
+                            var vs = dbresponse[j].ValueStream_Name;
+                            var appData = {};
+                            for (var k in dbresponse) {
+                                if((pf===dbresponse[k].Portfolio_Name) && (vs===dbresponse[k].ValueStream_Name)){
+                                    var app = dbresponse[k].CI_Application_Name;
+                                    appData[app]=app;
+                                }
+                            }
+                            vsData[vs]=appData
+                        }
+                    }
+                    treeData[pf] = vsData; 
+                }
+                res.send(treeData);
+                //console.log(treeData);
+             }
+         });
+     }
+    });
+
+
+
 
  });
 
