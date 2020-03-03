@@ -108,9 +108,10 @@
     var orderByCol=req.query.sort;
     var sortOrder=req.query.order;
     var apps=req.query.app;
-    var dateFrom=req.query.dtFrm;
-    var dateTo=req.query.dtTo;
-    console.log("app:"+app);
+    var dateFrom=req.query.dtfrm;
+    var dateTo=req.query.dtto;
+    console.log("dateFrom:"+dateFrom);
+    console.log("dateTo:"+dateTo);
     if(sortOrder.toUpperCase() === "DESC"){
         sortOrder="DESC";
     }else{
@@ -119,16 +120,29 @@
     console.log(itemsPerPage);
     var offset = (page - 1) * itemsPerPage;
     console.log("page:"+page+", size:"+itemsPerPage+", offset:"+offset);
-    
+
+    var whereClause="";
     if(apps){
         var appsin = '\'' + apps.split(',').join('\',\'') + '\'';
-        var query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] WHERE CI_Application_Name IN ("+appsin+") ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"
-    }else{
-        var query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"
+        whereClause="WHERE CI_Application_Name IN ("+appsin+")";
     }
-    
+
+    if(dateFrom && dateTo){
+        console.log("11");
+        if(apps){
+            whereClause=whereClause+" AND Start_DateTimeStamp BETWEEN \'"+dateFrom+"\' AND \'"+dateTo+"\'";
+            console.log("12");
+        }else{
+            whereClause="WHERE Start_DateTimeStamp BETWEEN \'"+dateFrom+"\' AND \'"+dateTo+"\'";
+            console.log("13");
+        }
+    }
+
+    var _query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] #CONDITION# ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"    
+    var query = _query.replace("#CONDITION#", whereClause);
     console.log("query:"+query);
-    executeQueryBuilds(res, query);
+    //executeQueryBuilds(res, query);
+    //http://localhost:8080/api/page/?sort=Build_ID&order=ASC&pg=1&sz=3&app=CIApplication-AAA&dtfrm=2019-11-01&dtto=2019-11-30
  });
 
 app.get("/api/json", function(req, res) {
