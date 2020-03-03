@@ -67,19 +67,22 @@
                      console.log("Error while querying database :- " + err);
                      res.send(err);
                  } else {
-                    console.log("Exec query leng: success# len::"+dbresponse.length);
+                    console.log("Exec query leng: success");
                     //if (dbresponse.length > 0) {
-                        //if (dbresponse){
+                        if (dbresponse){
                             jsonArry=dbresponse.recordsets[0];
-                            var buildData = {};
-                            buildData.total_count=jsonArry[0]['total_count'];
-                            for(var i = 0; i < jsonArry.length; i++) {
-                                delete jsonArry[i]['total_count'];
+                            console.log("jsonArry.length"+jsonArry.length);
+                            if (jsonArry.length>0){
+                                var buildData = {};
+                                buildData.total_count=jsonArry[0]['total_count'];
+                                for(var i = 0; i < jsonArry.length; i++) {
+                                    delete jsonArry[i]['total_count'];
+                                }
+                                buildData.builds=jsonArry;
+                                res.send(JSON.stringify(buildData));
                             }
-                            buildData.builds=jsonArry;
-                            res.send(JSON.stringify(buildData));
-                    //    }
-                    //}  
+                        }
+                    //}
                  }
              });
          }
