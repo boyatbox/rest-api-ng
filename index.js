@@ -71,7 +71,7 @@
                     //if (dbresponse.length > 0) {
                         if (dbresponse){
                             jsonArry=dbresponse.recordsets[0];
-                            console.log("jsonArry.length"+jsonArry.length);
+                            console.log("jsonArry.length: "+jsonArry.length);
                             if (jsonArry.length>0){
                                 var buildData = {};
                                 buildData.total_count=jsonArry[0]['total_count'];
@@ -80,6 +80,8 @@
                                 }
                                 buildData.builds=jsonArry;
                                 res.send(JSON.stringify(buildData));
+                            }else{
+                                res.send(JSON.stringify(err));
                             }
                         }
                     //}
