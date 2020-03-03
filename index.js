@@ -108,6 +108,8 @@
     var orderByCol=req.query.sort;
     var sortOrder=req.query.order;
     var apps=req.query.app;
+    var dateFrom=req.query.dtFrm;
+    var dateTo=req.query.dtTo;
     console.log("app:"+app);
     if(sortOrder.toUpperCase() === "DESC"){
         sortOrder="DESC";
