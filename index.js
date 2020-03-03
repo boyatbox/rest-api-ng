@@ -67,15 +67,19 @@
                      console.log("Error while querying database :- " + err);
                      res.send(err);
                  } else {
-                    console.log("Exec query: success");
-                    jsonArry=dbresponse.recordsets[0];
-                    var buildData = {};
-                    buildData.total_count=jsonArry[0]['total_count'];
-                    for(var i = 0; i < jsonArry.length; i++) {
-                        delete jsonArry[i]['total_count'];
-                    }
-                    buildData.builds=jsonArry;
-                    res.send(JSON.stringify(buildData));
+                    console.log("Exec query leng: success# len::"+dbresponse.length);
+                    //if (dbresponse.length > 0) {
+                        //if (dbresponse){
+                            jsonArry=dbresponse.recordsets[0];
+                            var buildData = {};
+                            buildData.total_count=jsonArry[0]['total_count'];
+                            for(var i = 0; i < jsonArry.length; i++) {
+                                delete jsonArry[i]['total_count'];
+                            }
+                            buildData.builds=jsonArry;
+                            res.send(JSON.stringify(buildData));
+                    //    }
+                    //}  
                  }
              });
          }
@@ -98,10 +102,13 @@
  //localhost:8080/api/page/?sort=columnname&order=asc&pg=2&sz=3
  //http://localhost:8080/api/page/?sort=Build_ID&order=asc&pg=2&sz=3
  app.get("/api/page", function(req, res) {
+    console.log("/api/page:"+app);
     var page=req.query.pg;
     var itemsPerPage=req.query.sz;
     var orderByCol=req.query.sort;
     var sortOrder=req.query.order;
+    var apps=req.query.app;
+    console.log("app:"+app);
     if(sortOrder.toUpperCase() === "DESC"){
         sortOrder="DESC";
     }else{
@@ -110,7 +117,15 @@
     console.log(itemsPerPage);
     var offset = (page - 1) * itemsPerPage;
     console.log("page:"+page+", size:"+itemsPerPage+", offset:"+offset);
-    var query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"
+    
+    if(apps){
+        var appsin = '\'' + apps.split(',').join('\',\'') + '\'';
+        var query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] WHERE CI_Application_Name IN ("+appsin+") ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"
+    }else{
+        var query = "SELECT *,COUNT(*) OVER () AS total_count FROM [testdb].[dbo].[BuildList] ORDER BY "+orderByCol+" "+sortOrder+" OFFSET "+offset+" ROWS FETCH NEXT "+itemsPerPage+" ROWS ONLY;"
+    }
+    
+    console.log("query:"+query);
     executeQueryBuilds(res, query);
  });
 
