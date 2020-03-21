@@ -298,24 +298,16 @@ var executeQueryBuilds = function (res, query) {
     });
 }
 app.get("/api/builds", function (req, res) {
-    //http://localhost:8080/api/builds/?sr=Build_ID&od=ASC&pg=1&sz=3&ap=&df=&dt=&pc=&ac=&ev=&tp=&tt=&tg=&rs=&ow=&bs=
     console.log("/api/page:" + app);
-    var orderByCol = req.query.sr;
-    var sortOrder = req.query.od;
     var page = req.query.pg;
     var itemsPerPage = req.query.sz;
-    var apps = req.query.ap;
-    var dateFrom = req.query.df;
-    var dateTo = req.query.dt;
-    var predictedRCA = req.query.pc;
-    var actualRCA = req.query.ac;
-    var environment = req.query.ev;
-    var testType = req.query.tp;
-    var testingTool = req.query.tt;
-    var trigger = req.query.tg;
-    var reviewStatus = req.query.rs;
-    var owner = req.query.ow;
-    var buildStatus = req.query.bs;
+    var orderByCol = req.query.sort;
+    var sortOrder = req.query.order;
+    var apps = req.query.app;
+    var dateFrom = req.query.dtfrm;
+    var dateTo = req.query.dtto;
+    var predictedRCA = req.query.prc;
+    var buildStatus = req.query.st;
     if (sortOrder.toUpperCase() === "DESC") {
         sortOrder = "DESC";
     } else {
@@ -336,42 +328,11 @@ app.get("/api/builds", function (req, res) {
         var predictedRcaIn = '\'' + predictedRCA.split(',').join('\',\'') + '\'';
         whereClause = whereClause + " AND Predicted_RCA IN (" + predictedRcaIn + ")";
     }
-    if (actualRCA) {
-        var actualRCAIn = '\'' + actualRCA.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND Actual_RCA IN (" + actualRCAIn + ")";
-    }
-    if (environment) {
-        var environmentIn = '\'' + environment.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND Test_Environment IN (" + environmentIn + ")";
-    }
-    if (testType) {
-        var testTypeIn = '\'' + testType.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND Test_Type IN (" + testTypeIn + ")";
-    }
-    if (testingTool) {
-        var testingToolIn = '\'' + testingTool.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND Test_Tool IN (" + testingToolIn + ")";
-    }
-    if (trigger) {
-        var triggerIn = '\'' + trigger.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND Trigger_Type IN (" + triggerIn + ")";
-    }
-    if (reviewStatus) {
-        var reviewStatusIn = '\'' + reviewStatus.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND RCA_Review_Status IN (" + reviewStatusIn + ")";
-    }
-    if (owner) {
-        var ownerIn = '\'' + owner.split(',').join('\',\'') + '\'';
-        whereClause = whereClause + " AND User_Email IN (" + ownerIn + ")";
-    }
-
 
     if (buildStatus) {
         var buildStatusIn = '\'' + buildStatus.split(',').join('\',\'') + '\'';
         whereClause = whereClause + " AND Build_Status IN (" + buildStatusIn + ")";
     }
-    //http://localhost:8080/api/builds/?sort=Build_ID&order=ASC&pg=1&sz=3&app=&dtfrm=&dtto=&prc=&arc=&ev=&tp=&tt=&tg=&rs=&ow=&bs=passed,failed
-
     if (whereClause.substring(1, 5).trim() === "AND") {
         var whereClause = whereClause.substring(5, whereClause.length).trim();
     }
